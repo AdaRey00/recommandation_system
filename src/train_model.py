@@ -56,9 +56,6 @@ cosine_similarity_dict = {}
 for row_idx, top_indices in pairwise_cosine_similarity(book_titles_tfidf, chunk_size=10):
     cosine_similarity_dict[row_idx] = top_indices
 
-# Now you can save this dictionary
-
-
 # Check if the directory exists, and if not, create it
 models_directory = '../models'
 if not os.path.exists(models_directory):
