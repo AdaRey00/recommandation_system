@@ -5,6 +5,7 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import svds
 from joblib import dump
 from utils import pairwise_cosine_similarity
+import os
 
 book_df = pd.read_csv('../data/Books.csv', low_memory=False)
 rating_df = pd.read_csv('../data/Ratings.csv')
@@ -50,9 +51,22 @@ book_titles_tfidf = tfidf_vectorizer.fit_transform(book_df['Book-Title'].fillna(
 # Calculate cosine similarity between book titles in batches
 cosine_sim_titles = pairwise_cosine_similarity(book_titles_tfidf, chunk_size=10)
 
+# Assuming your pairwise_cosine_similarity function yields row_idx, top_indices
+cosine_similarity_dict = {}
+for row_idx, top_indices in pairwise_cosine_similarity(book_titles_tfidf, chunk_size=10):
+    cosine_similarity_dict[row_idx] = top_indices
+
+# Now you can save this dictionary
+
+
+# Check if the directory exists, and if not, create it
+models_directory = '../models'
+if not os.path.exists(models_directory):
+    os.makedirs(models_directory)
+
 # Save the necessary components
-dump(tfidf_vectorizer, 'models/tfidf_vectorizer.joblib')
-dump(cosine_sim_titles, 'models/cosine_sim_titles.joblib')
+dump(tfidf_vectorizer, '../models/tfidf_vectorizer.joblib')
+dump(cosine_similarity_dict, '../models/cosine_sim_titles.joblib')
 dump(interaction_matrix, 'models/interaction_matrix.joblib')
 dump(U, 'models/U.joblib')
 dump(sigma, 'models/sigma.joblib')

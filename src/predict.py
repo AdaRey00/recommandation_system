@@ -3,8 +3,8 @@ from flask import Flask, request, jsonify
 from utils import hybrid_recommendations
 
 # Load the saved components
-tfidf_vectorizer = load('models/tfidf_vectorizer.joblib')
-cosine_sim_titles = load('models/cosine_sim_titles.joblib')
+tfidf_vectorizer = load('../models/tfidf_vectorizer.joblib')
+cosine_sim_titles = load('../models/cosine_sim_titles.joblib')
 interaction_matrix = load('models/interaction_matrix.joblib')
 U = load('models/U.joblib')
 sigma = load('models/sigma.joblib')

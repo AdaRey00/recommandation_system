@@ -2,9 +2,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
 
-def pairwise_cosine_similarity(matrix, chunk_size=100):
+def pairwise_cosine_similarity(matrix, top_n=10, chunk_size=100):
     n_rows = matrix.shape[0]
-    similarities = {}
 
     for start_row in range(0, n_rows, chunk_size):
         end_row = min(start_row + chunk_size, n_rows)
@@ -14,17 +13,19 @@ def pairwise_cosine_similarity(matrix, chunk_size=100):
             comparison_end = min(comparison_start + chunk_size, n_rows)
             comparison_chunk = matrix[comparison_start:comparison_end]
 
+            # Compute cosine similarity for the batch
             chunk_similarities = cosine_similarity(chunk, comparison_chunk)
 
             for i, row_idx in enumerate(range(start_row, end_row)):
-                if row_idx not in similarities:
-                    similarities[row_idx] = {}
+                # Get indices of top N similar books, excluding the book itself
+                if comparison_start <= row_idx < comparison_end:
+                    # Exclude self-similarity from the results
+                    top_indices = np.argsort(chunk_similarities[i])[:-top_n-1:-1]
+                else:
+                    top_indices = np.argsort(chunk_similarities[i])[-top_n:]
 
-                for j, comparison_idx in enumerate(range(comparison_start, comparison_end)):
-                    if row_idx != comparison_idx:
-                        similarities[row_idx][comparison_idx] = chunk_similarities[i, j]
-
-    return similarities
+                # Yield the row index and the indices of the top N similar rows
+                yield row_idx, top_indices
 
 
 def hybrid_recommendations(user_id, book_id, top_n=5):
